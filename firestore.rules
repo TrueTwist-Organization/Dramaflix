@@ -1,0 +1,43 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users Profile Collection
+    match /users/{userId} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Public Content Collections
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /series/{seriesId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /videos/{videoId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // User-specific Private Collections (protected)
+    match /bookmarks/{bookmarkId} {
+      allow read, write: if request.auth != null && bookmarkId.startsWith(request.auth.uid + "_");
+    }
+
+    match /video_likes/{likeId} {
+      allow read, write: if request.auth != null && likeId.startsWith(request.auth.uid + "_");
+    }
+
+    match /watch_history/{historyId} {
+      allow read, write: if request.auth != null && historyId.startsWith(request.auth.uid + "_");
+    }
+
+    match /follows/{followId} {
+      allow read, write: if request.auth != null && followId.startsWith(request.auth.uid + "_");
+    }
+  }
+}
